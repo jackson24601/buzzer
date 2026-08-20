@@ -1,25 +1,14 @@
 {
   "name": "classroom-buzzer",
-  "version": "1.0.0",
-  "description": "A classroom team buzzer: students pick a color, the first team to press wins the round.",
+  "version": "1.1.0",
+  "private": true,
+  "description": "A classroom team buzzer that runs as a static GitHub Pages site.",
   "type": "module",
-  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js",
     "test": "node --test"
   },
   "engines": {
     "node": ">=20"
-  },
-  "keywords": ["buzzer", "classroom", "quiz"],
-  "license": "MIT",
-  "dependencies": {
-    "express": "^5.1.0",
-    "qrcode": "^1.5.4",
-    "socket.io": "^4.8.1"
-  },
-  "devDependencies": {
-    "socket.io-client": "^4.8.1"
   }
 }

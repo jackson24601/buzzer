@@ -2,6 +2,10 @@
 
 A simple website for in-class quiz games. Students join from a laptop or phone, pick one of four team colors, and that device becomes a buzzer. The teacher screen shows **which team pressed first**. Reset between questions and go again.
 
+**Live site (after this is on `main`):** [https://jackson24601.github.io/buzzer/](https://jackson24601.github.io/buzzer/)
+
+GitHub Pages only hosts static files. This app is a static site, so that Pages URL is the classroom website. Keep the teacher tab open while students play.
+
 ## How to use it in class
 
 1. On the projector or teacher computer, open the site and click **Start a game**.
@@ -12,10 +16,9 @@ A simple website for in-class quiz games. Students join from a laptop or phone, 
 
 Students can press the on-screen button or the spacebar. Several students can sit on the same color; the first press from that team is what counts.
 
-## Run it
+## Run it locally
 
 ```bash
-npm install
 npm start
 ```
 
@@ -27,6 +30,6 @@ npm test
 
 runs the first-press / reset rules without a browser.
 
-## Deploy
+## GitHub Pages
 
-Any Node host works (Render, Railway, Fly, a classroom PC). Set `PORT` if the platform needs it. Because buzzes are decided on the server, a slightly laggy student Wi-Fi connection cannot rewrite who was first.
+This repository is already set to publish from the `main` branch root. Merge to `main` (or point Pages at this branch) and the app is at `https://jackson24601.github.io/buzzer/`. No Node host is required.

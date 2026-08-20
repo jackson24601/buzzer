@@ -1,9 +1,30 @@
-import { playLockIn, playOpen, queryParam, reasonText, socket, teamLabel } from './shared.js';
+import { createSession } from './lib/session.js';
+import { randomCode } from './lib/game.js';
+import {
+  connectBus,
+  joinUrl,
+  makeQrDataUrl,
+  playLockIn,
+  playOpen,
+  publish,
+  queryParam,
+  reasonText,
+  siteUrl,
+  teamLabel,
+  topicsFor,
+} from './shared.js';
 
-const code = queryParam('code').toUpperCase();
-const token = queryParam('token');
-const ioClient = socket();
+let code = queryParam('code').toUpperCase();
+let token = queryParam('token');
 
+if (!code || !token) {
+  code = randomCode();
+  token = crypto.randomUUID();
+  history.replaceState({}, '', siteUrl('host.html', { code, token }).href);
+}
+
+const session = createSession(code, token);
+const topics = topicsFor(code);
 const roomCodeEl = document.querySelector('#room-code-display');
 const joinUrlEl = document.querySelector('#join-url');
 const qrImage = document.querySelector('#qr-image');
@@ -17,12 +38,14 @@ const openBtn = document.querySelector('#open-btn');
 const nextBtn = document.querySelector('#next-btn');
 const standbyBtn = document.querySelector('#standby-btn');
 
-let lastStatus = null;
-let state = null;
+let lastStatus = session.getState().status;
+let state = session.getState();
+let client;
 
-roomCodeEl.textContent = code || '————';
-joinUrlEl.textContent = `${window.location.origin}/?room=${code}`;
-qrImage.src = `/api/qr/${encodeURIComponent(code)}`;
+const shareUrl = joinUrl(code);
+roomCodeEl.textContent = code;
+joinUrlEl.textContent = shareUrl;
+qrImage.src = makeQrDataUrl(shareUrl);
 
 function renderTeams(nextState) {
   teamsEl.innerHTML = '';
@@ -60,7 +83,7 @@ function render(nextState) {
   if (nextState.status === 'standby') {
     statusKicker.textContent = 'Stand by';
     statusTitle.textContent = 'Read the question, then open the buzzers.';
-    statusDetail.textContent = 'Students can join now. Nobody can buzz until you press Open.';
+    statusDetail.textContent = 'Keep this tab open. Students can join now; nobody can buzz until you press Open.';
   } else if (nextState.status === 'open') {
     statusKicker.textContent = 'Live';
     statusTitle.textContent = 'Listening for the first team…';
@@ -79,43 +102,66 @@ function render(nextState) {
   standbyBtn.disabled = nextState.status === 'standby';
 }
 
-function hostAction(eventName, extra = {}) {
-  ioClient.emit(eventName, { token, ...extra }, (result) => {
-    if (result && result.ok === false) {
-      statusDetail.textContent = reasonText(result.reason);
-    }
-  });
+function publishState() {
+  const nextState = session.getState();
+  if (lastStatus !== 'locked' && nextState.status === 'locked') playLockIn();
+  if (lastStatus !== 'open' && nextState.status === 'open') playOpen();
+  lastStatus = nextState.status;
+  render(nextState);
+  if (client?.isConnected()) publish(client, topics.state, nextState, { retain: true });
 }
 
-openBtn.addEventListener('click', () => hostAction('host:open'));
-standbyBtn.addEventListener('click', () => hostAction('host:standby'));
-nextBtn.addEventListener('click', () => hostAction('host:reset', { open: false }));
+function handleHostMessage(_topic, message) {
+  if (message.type === 'join') {
+    session.join(message.playerId, message.name, message.team);
+    publishState();
+  } else if (message.type === 'buzz') {
+    session.buzz(message.playerId);
+    publishState();
+  } else if (message.type === 'leave') {
+    session.leave(message.playerId);
+    publishState();
+  }
+}
+
+function hostAction(action) {
+  const result = session[action](token);
+  if (result.ok === false) {
+    statusDetail.textContent = reasonText(result.reason);
+    return;
+  }
+  publishState();
+}
+
+openBtn.addEventListener('click', () => hostAction('open'));
+standbyBtn.addEventListener('click', () => hostAction('standby'));
+nextBtn.addEventListener('click', () => hostAction('reset'));
 
 document.addEventListener('keydown', (event) => {
   if (event.target.matches('input, textarea')) return;
   if (event.code === 'Space') {
     event.preventDefault();
-    if (state?.status !== 'open') hostAction('host:open');
+    if (state?.status !== 'open') hostAction('open');
   }
   if (event.key === 'n' || event.key === 'N' || event.key === 'r' || event.key === 'R') {
-    hostAction('host:reset', { open: false });
+    hostAction('reset');
   }
 });
 
-ioClient.on('state', (nextState) => {
-  if (lastStatus !== 'locked' && nextState.status === 'locked') playLockIn();
-  if (lastStatus !== 'open' && nextState.status === 'open') playOpen();
-  lastStatus = nextState.status;
-  render(nextState);
-});
+render(session.getState());
 
-ioClient.emit('host:join', { code, token }, (result) => {
-  if (!result?.ok) {
-    statusKicker.textContent = 'Host link problem';
-    statusTitle.textContent = 'Could not open this game.';
-    statusDetail.textContent = reasonText(result?.reason);
-    return;
-  }
-  lastStatus = result.state.status;
-  render(result.state);
+client = connectBus({
+  clientId: `host-${code}-${crypto.randomUUID().slice(0, 8)}`,
+  onMessage: handleHostMessage,
+  onConnect: (connected) => {
+    client = connected;
+    connected.subscribe(topics.toHost);
+    publishState();
+    statusLabel.textContent = 'Waiting for students…';
+  },
+  onFail: (error) => {
+    statusKicker.textContent = 'Connection problem';
+    statusTitle.textContent = 'Could not start the live buzzer.';
+    statusDetail.textContent = error || reasonText('offline');
+  },
 });
