@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Classroom Buzzer</title>
+    <meta name="description" content="Turn student computers into team buzzers. First color to press wins the round." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <a class="brand" href="/">BUZZ</a>
+        <p class="topbar-note">Classroom team buzzer</p>
+      </header>
+
+      <main id="home-main" class="home">
+        <section class="hero">
+          <p class="eyebrow">Four teams. One button. Instant lock-in.</p>
+          <h1>Who hit the buzzer first?</h1>
+          <p class="lede">
+            Students join on a laptop or phone, pick a team color, and press. Your screen shows
+            which of the four teams got there first. Reset and go again.
+          </p>
+        </section>
+
+        <section class="split">
+          <button class="role-card" id="teacher-btn" type="button">
+            <span class="role-kicker">Teacher</span>
+            <strong>Start a game</strong>
+            <span>Opens a host screen with a join code, live teams, and a reset button.</span>
+          </button>
+          <button class="role-card role-card-student" id="student-btn" type="button">
+            <span class="role-kicker">Student</span>
+            <strong>Join a team</strong>
+            <span>Enter the code, pick red, blue, green, or yellow, and wait for the question.</span>
+          </button>
+        </section>
+        <p id="home-error" class="error hidden" role="alert"></p>
+      </main>
+
+      <main id="join-main" class="join hidden">
+        <form id="join-form" class="panel">
+          <p class="eyebrow">Student login</p>
+          <h1>Join the buzzer</h1>
+          <label>
+            Room code
+            <input
+              id="room-code"
+              name="code"
+              maxlength="4"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="ABCD"
+              required
+            />
+          </label>
+          <label>
+            Your name
+            <input id="student-name" name="name" maxlength="24" autocomplete="nickname" placeholder="Maya" required />
+          </label>
+          <fieldset>
+            <legend>Pick your team color</legend>
+            <div class="color-grid" id="color-grid"></div>
+          </fieldset>
+          <button class="primary-btn" type="submit">Become a buzzer</button>
+          <p id="join-error" class="error hidden" role="alert"></p>
+          <p class="fine-print"><a href="/">Back to home</a></p>
+        </form>
+      </main>
+    </div>
+    <script type="module" src="/home.js"></script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Teacher host · Classroom Buzzer</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="host-body">
+    <div class="page host-page">
+      <header class="topbar">
+        <a class="brand" href="/">BUZZ</a>
+        <p class="topbar-note" id="host-status-label">Starting…</p>
+      </header>
+
+      <section class="host-join">
+        <div>
+          <p class="eyebrow">Students join at this site with</p>
+          <p class="room-code" id="room-code-display">————</p>
+          <p class="join-url" id="join-url"></p>
+        </div>
+        <img id="qr-image" class="qr" alt="QR code for students to join" />
+      </section>
+
+      <section class="status-banner" id="status-banner" data-status="standby">
+        <p class="status-kicker" id="status-kicker">Stand by</p>
+        <h1 id="status-title">Read the question, then open the buzzers.</h1>
+        <p id="status-detail">Students can join now. Nobody can buzz until you press Open.</p>
+      </section>
+
+      <section class="teams" id="teams"></section>
+
+      <section class="host-actions">
+        <button class="primary-btn go-btn" id="open-btn" type="button">Open buzzers</button>
+        <button class="ghost-btn" id="next-btn" type="button">Next question</button>
+        <button class="ghost-btn" id="standby-btn" type="button">Hold / stand by</button>
+      </section>
+      <p class="fine-print host-help">
+        Shortcut: spacebar opens the buzzers. N starts the next question.
+      </p>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="/host.js"></script>
+  </body>
+</html>
