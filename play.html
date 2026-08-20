@@ -4,14 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
     <title>Buzzer · Classroom Buzzer</title>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="play-body">
     <div id="play-root" class="play-root" data-team="red">
@@ -24,7 +24,7 @@
       </button>
       <p id="play-message" class="play-message">Waiting for your teacher to open the buzzers.</p>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="module" src="/play.js"></script>
+    <script src="vendor/paho-mqtt.min.js"></script>
+    <script type="module" src="play.js"></script>
   </body>
 </html>

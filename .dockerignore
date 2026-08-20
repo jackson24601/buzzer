@@ -1,4 +1,7 @@
 node_modules
 .git
+.github
+test
 npm-debug.log*
 .env
+README.md
